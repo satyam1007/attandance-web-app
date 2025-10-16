@@ -492,7 +492,7 @@ input:focus, select:focus {
     padding: 12px 20px;
     border-radius: var(--border-radius-sm);
     background: var(--light-color);
-    min-width: 60px;
+    min-width: 50px;
 }
 
 .stat-value {
