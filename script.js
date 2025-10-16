@@ -1,11 +1,4 @@
-// Offline Attendance Web App
-// This app runs entirely in the browser and uses LocalStorage for data persistence
-
-// Data Storage Schema:
-// - students_{class}_{section}: Array of student objects
-// - attendance_{class}_{section}: Array of attendance records
-// Example student: { id, name, roll, image (base64) }
-// Example attendance: { date, students: [{ roll, name, status }] }
+// Online Attendance Web App
 
 // Global variables
 let currentClass = '';
@@ -1038,6 +1031,64 @@ function exportReportPDF() {
     // Save the PDF
     doc.save(`report_${student.name}_${month}.pdf`);
     showToast('Report exported as PDF successfully', 'success');
+}
+
+/**
+ * Load sample data for testing
+ */
+function loadSampleData() {
+    if (students.length > 0 && !confirm('This will replace existing students and attendance records. Continue?')) {
+        return;
+    }
+    
+    // Sample students
+    const sampleStudents = [
+        { id: generateId(), name: 'Aman Sharma', roll: 1, image: '' },
+        { id: generateId(), name: 'Priya Patel', roll: 2, image: '' },
+        { id: generateId(), name: 'Rahul Kumar', roll: 3, image: '' },
+        { id: generateId(), name: 'Sneha Singh', roll: 4, image: '' },
+        { id: generateId(), name: 'Vikram Joshi', roll: 5, image: '' }
+    ];
+    
+    // Sample attendance records (last 30 days)
+    const sampleAttendance = [];
+    const today = new Date();
+    
+    for (let i = 0; i < 30; i++) {
+        const date = new Date();
+        date.setDate(today.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        const studentsAttendance = sampleStudents.map(student => {
+            // Randomly assign attendance (80% present)
+            const status = Math.random() > 0.2 ? 'Present' : 'Absent';
+            return {
+                roll: student.roll,
+                name: student.name,
+                status: status
+            };
+        });
+        
+        sampleAttendance.push({
+            date: dateStr,
+            students: studentsAttendance
+        });
+    }
+    
+    // Save sample data
+    students = sampleStudents;
+    attendanceRecords = sampleAttendance;
+    
+    saveStudents();
+    saveAttendanceRecords();
+    
+    // Update UI
+    renderStudents();
+    renderAttendance();
+    renderAttendanceHistory();
+    populateStudentSelect();
+    
+    showToast('Sample data loaded successfully', 'success');
 }
 
 /**
