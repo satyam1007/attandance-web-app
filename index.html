@@ -1,1 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Attendance System</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- jsPDF for PDF export functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header>
+            <h1>Online Attendance System</h1>
+            <div class="class-info" id="classInfo">
+                <span id="currentClass">No class selected</span>
+                <button id="changeClassBtn" class="btn-secondary">Change Class</button>
+            </div>
+        </header>
 
+        <!-- Class Setup Section -->
+        <section id="classSetup" class="card">
+            <h2>Setup Your Class</h2>
+            <div class="form-group">
+                <label for="className">Class Name</label>
+                <input type="text" id="className" placeholder="e.g., Grade 10">
+            </div>
+            <div class="form-group">
+                <label for="sectionName">Section</label>
+                <input type="text" id="sectionName" placeholder="e.g., A">
+            </div>
+            <button id="loadClassBtn" class="btn-primary">Load/Create Class</button>
+        </section>
+
+        <!-- Main App (hidden initially) -->
+        <main id="mainApp" class="hidden">
+            <!-- Navigation Tabs -->
+            <nav class="tabs">
+                <button class="tab-btn active" data-tab="students">Students</button>
+                <button class="tab-btn" data-tab="attendance">Mark Attendance</button>
+                <button class="tab-btn" data-tab="history">Attendance History</button>
+                <button class="tab-btn" data-tab="reports">Student Reports</button>
+            </nav>
+
+            <!-- Students Tab -->
+            <section id="students" class="tab-content active">
+                <div class="section-header">
+                    <h2>Student Management</h2>
+                    <button id="addStudentBtn" class="btn-primary">Add Student</button>
+                </div>
+                
+                <!-- Search and Filter -->
+                <div class="search-filter">
+                    <input type="text" id="studentSearch" placeholder="Search by name or roll number...">
+                    <select id="rollSort">
+                        <option value="asc">Roll No: Low to High</option>
+                        <option value="desc">Roll No: High to Low</option>
+                    </select>
+                </div>
+                
+                <!-- Students List -->
+                <div id="studentsList" class="students-list"></div>
+            </section>
+
+            <!-- Attendance Tab -->
+            <section id="attendance" class="tab-content">
+                <div class="section-header">
+                    <h2>Mark Attendance</h2>
+                    <div class="attendance-actions">
+                        <button id="markAllPresent" class="btn-secondary">Mark All Present</button>
+                        <button id="markAllAbsent" class="btn-secondary">Mark All Absent</button>
+                        <button id="saveAttendance" class="btn-primary">Save Attendance</button>
+                    </div>
+                </div>
+                
+                <div class="attendance-date">
+                    <label for="attendanceDate">Date:</label>
+                    <input type="date" id="attendanceDate" value="">
+                </div>
+                
+                <div id="attendanceList" class="attendance-list"></div>
+            </section>
+
+            <!-- History Tab -->
+            <section id="history" class="tab-content">
+                <div class="section-header">
+                    <h2>Attendance History</h2>
+                </div>
+                
+                <div id="historyList" class="history-list"></div>
+            </section>
+
+            <!-- Reports Tab -->
+            <section id="reports" class="tab-content">
+                <div class="section-header">
+                    <h2>Student Reports</h2>
+                </div>
+                
+                <div class="report-controls">
+                    <div class="form-group">
+                        <label for="studentSelect">Select Student:</label>
+                        <select id="studentSelect"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportMonth">Select Month:</label>
+                        <input type="month" id="reportMonth">
+                    </div>
+                    <button id="generateReport" class="btn-primary">Generate Report</button>
+                </div>
+                
+                <div id="reportResults" class="report-results"></div>
+            </section>
+
+            <!-- Export Section -->
+            <section class="export-section">
+                <h3>Export Data</h3>
+                <div class="export-actions">
+                    <button id="exportStudentsCSV" class="btn-secondary">Export Students (CSV)</button>
+                    <button id="exportAttendancePDF" class="btn-secondary">Export Current Attendance (PDF)</button>
+                    <button id="exportReportPDF" class="btn-secondary">Export Student Report (PDF)</button>
+                </div>
+            </section>
+
+            <!-- Sample Data Section -->
+            <section class="sample-data-section">
+                <h3>Testing Tools</h3>
+                <button id="clearAllData" class="btn-danger">Clear All Data for This Class</button>
+            </section>
+        </main>
+
+        <!-- Student Modal -->
+        <div id="studentModal" class="modal hidden">
+            <div class="modal-content">
+                <h2 id="modalTitle">Add Student</h2>
+                <form id="studentForm">
+                    <div class="form-group">
+                        <label for="studentName">Name</label>
+                        <input type="text" id="studentName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentRoll">Roll Number</label>
+                        <input type="number" id="studentRoll" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentImage">Student Photo (Optional)</label>
+                        <input type="file" id="studentImage" accept="image/*">
+                        <div id="imagePreview" class="image-preview"></div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="cancelStudentBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Attendance Detail Modal -->
+        <div id="attendanceDetailModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Attendance Details</h2>
+                <div id="attendanceDetailContent"></div>
+                <div class="form-actions">
+                    <button id="closeDetailBtn" class="btn-primary">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
