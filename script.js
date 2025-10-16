@@ -307,10 +307,10 @@ function renderStudents() {
             </div>
             <div class="student-actions">
                 <button class="action-btn edit" onclick="editStudent('${student.id}')">
-                    <i class="fas fa-edit"></i>
+                ✏️
                 </button>
                 <button class="action-btn delete" onclick="deleteStudent('${student.id}')">
-                    <i class="fas fa-trash"></i>
+                🗑️
                 </button>
             </div>
         </div>
