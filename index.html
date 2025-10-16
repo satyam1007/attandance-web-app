@@ -13,7 +13,7 @@
     <div class="container">
         <!-- Header Section -->
         <header>
-            <h1>Online Attendance System</h1>
+            <h1>Offline Attendance System</h1>
             <div class="class-info" id="classInfo">
                 <span id="currentClass">No class selected</span>
                 <button id="changeClassBtn" class="btn-secondary">Change Class</button>
@@ -122,6 +122,13 @@
                     <button id="exportReportPDF" class="btn-secondary">Export Student Report (PDF)</button>
                 </div>
             </section>
+
+            <!-- Sample Data Section -->
+            <section class="sample-data-section">
+                <h3>Testing Tools</h3>
+                <button id="loadSampleData" class="btn-secondary">Load Sample Data</button>
+                <button id="clearAllData" class="btn-danger">Clear All Data for This Class</button>
+            </section>
         </main>
 
         <!-- Student Modal -->
@@ -165,6 +172,6 @@
         <div id="toast" class="toast hidden"></div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
