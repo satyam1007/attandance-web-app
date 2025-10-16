@@ -1043,7 +1043,7 @@ function loadSampleData() {
     
     // Sample students
     const sampleStudents = [
-        { id: generateId(), name: 'Aman Sharma', roll: 1, image: '' },
+        { id: generateId(), name: 'Amit Sharma', roll: 1, image: '' },
         { id: generateId(), name: 'Priya Patel', roll: 2, image: '' },
         { id: generateId(), name: 'Rahul Kumar', roll: 3, image: '' },
         { id: generateId(), name: 'Sneha Singh', roll: 4, image: '' },
