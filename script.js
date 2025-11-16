@@ -7,6 +7,11 @@ let students = [];
 let attendanceRecords = [];
 let editingStudentId = null;
 
+let leaveData = [];
+let marksData = [];
+let feeData = [];
+
+
 // DOM Elements
 const classSetupSection = document.getElementById('classSetup');
 const mainAppSection = document.getElementById('mainApp');
@@ -123,6 +128,170 @@ function initializeApp() {
     }
 }
 
+function loadLeaveData() {
+    const key = `leave_${currentClass}_${currentSection}`;
+    leaveData = JSON.parse(localStorage.getItem(key)) || [];
+    renderLeaveList();
+}
+
+function saveLeaveData() {
+    const key = `leave_${currentClass}_${currentSection}`;
+    localStorage.setItem(key, JSON.stringify(leaveData));
+}
+
+function renderLeaveList() {
+    const container = document.getElementById("leaveList");
+    if (!container) return;
+    
+    container.innerHTML = "";
+    const selectedDate = attendanceDate.value;
+
+    students.forEach(st => {
+        const leaveRecord = leaveData.find(l => l.roll === st.roll && l.date === selectedDate);
+        const leaveStatus = leaveRecord ? leaveRecord.status : "Present";
+
+        container.innerHTML += `
+            <div class="leave-item">
+                <span>${st.roll} - ${st.name}</span>
+                <select onchange="updateLeave(${st.roll}, this.value)">
+                    <option value="Present" ${leaveStatus==="Present"?"selected":""}>Present</option>
+                    <option value="Absent" ${leaveStatus==="Absent"?"selected":""}>Absent</option>
+                    <option value="Leave" ${leaveStatus==="Leave"?"selected":""}>Leave</option>
+                </select>
+            </div>
+        `;
+    });
+}
+
+function updateLeave(roll, value) {
+    const selectedDate = attendanceDate.value; // Get the current attendance date
+    
+    // Find existing leave record for this roll and date
+    const existingIndex = leaveData.findIndex(l => l.roll === roll && l.date === selectedDate);
+    
+    if (existingIndex !== -1) {
+        if (value === "Present") {
+            // Remove leave record if status is changed to Present
+            leaveData.splice(existingIndex, 1);
+        } else {
+            // Update existing record
+            leaveData[existingIndex].status = value;
+        }
+    } else if (value !== "Present") {
+        // Add new leave record only if status is not Present
+        leaveData.push({ 
+            roll, 
+            status: value, 
+            date: selectedDate 
+        });
+    }
+
+    saveLeaveData();
+    renderLeaveList();
+}
+
+
+function loadMarksData() {
+    const key = `marks_${currentClass}_${currentSection}`;
+    marksData = JSON.parse(localStorage.getItem(key)) || [];
+    renderMarksList();
+}
+
+function saveMarksData() {
+    const key = `marks_${currentClass}_${currentSection}`;
+    localStorage.setItem(key, JSON.stringify(marksData));
+}
+
+document.getElementById("saveMarksBtn").addEventListener("click", () => {
+    const roll = document.getElementById("marksStudentSelect").value;
+    const exam = document.getElementById("examType").value;
+    const marks = document.getElementById("examMarks").value;
+
+    marksData.push({ roll, exam, marks });
+    saveMarksData();
+    renderMarksList();
+});
+
+function renderMarksList() {
+    const div = document.getElementById("marksList");
+    div.innerHTML = "";
+
+    marksData.forEach((m, index) => {
+        div.innerHTML += `
+            <div class="marks-item">
+                <span>Roll: ${m.roll} | Exam: ${m.exam} | Marks: ${m.marks}</span>
+                <button class="delete-btn" onclick="deleteMarks(${index})">Delete</button>
+            </div>
+        `;
+    });
+}
+
+function deleteMarks(i) {
+    marksData.splice(i, 1);
+    saveMarksData();
+    renderMarksList();
+}
+
+
+function loadFeeData() {
+    const key = `fee_${currentClass}_${currentSection}`;
+    feeData = JSON.parse(localStorage.getItem(key)) || [];
+    renderFeeList();
+}
+
+function saveFeeData() {
+    const key = `fee_${currentClass}_${currentSection}`;
+    localStorage.setItem(key, JSON.stringify(feeData));
+}
+document.getElementById("saveFeeBtn").addEventListener("click", () => {
+    const roll = document.getElementById("feeStudentSelect").value;
+    const status = document.getElementById("feeStatus").value;
+    const amount = document.getElementById("feeAmount").value;
+
+    feeData.push({ roll, status, amount });
+    saveFeeData();
+    renderFeeList();
+});
+
+function renderFeeList() {
+    const div = document.getElementById("feeList");
+    div.innerHTML = "";
+
+    feeData.forEach((f, i) => {
+        div.innerHTML += `
+            <div class="fee-item marks-item">
+                <span>Roll: ${f.roll} | Status: ${f.status} | Amount: ${f.amount}</span>
+                <button class="delete-btn" onclick="deleteFee(${i})">Delete</button>
+            </div>
+        `;
+    });
+}
+
+function deleteFee(i) {
+    feeData.splice(i, 1);
+    saveFeeData();
+    renderFeeList();
+}
+
+
+function fillStudentDropdowns() {
+    const selects = [
+        document.getElementById("marksStudentSelect"),
+        document.getElementById("feeStudentSelect"),
+        document.getElementById("studentSelect") // Add this for reports tab
+    ];
+
+    selects.forEach(sel => {
+        if (sel) { // Check if element exists
+            sel.innerHTML = "";
+            students.forEach(st => {
+                sel.innerHTML += `<option value="${st.roll}">${st.roll} - ${st.name}</option>`;
+            });
+        }
+    });
+}
+
+
 /**
  * Load or create a class based on user input
  */
@@ -159,9 +328,13 @@ function loadClassData(className, sectionName) {
     // Load data from localStorage
     loadStudents();
     loadAttendanceRecords();
+    loadLeaveData(); // Add this line
+    loadMarksData(); // Add this line
+    loadFeeData();   // Add this line
     
     // Render initial views
     renderStudents();
+    fillStudentDropdowns();
     populateStudentSelect();
     
     showToast(`Class ${className} - Section ${sectionName} loaded successfully`, 'success');
@@ -177,6 +350,13 @@ function changeClass() {
     // Clear saved class
     localStorage.removeItem('currentClass');
     localStorage.removeItem('currentSection');
+    
+    // Reset in-memory data
+    students = [];
+    attendanceRecords = [];
+    leaveData = [];
+    marksData = [];
+    feeData = [];
     
     // Reset UI
     classSetupSection.classList.remove('hidden');
@@ -496,7 +676,10 @@ function deleteStudent(studentId) {
  * Populate the student select dropdown for reports
  */
 function populateStudentSelect() {
-    studentSelect.innerHTML = '<option value="">Select a student</option>';
+    studentSelect.innerHTML = `
+        <option value="">Select a student</option>
+        <option value="all">Select All - All Students Report</option>
+    `;
     
     students.forEach(student => {
         const option = document.createElement('option');
@@ -610,7 +793,11 @@ function saveAttendance() {
     toggles.forEach(toggle => {
         const roll = parseInt(toggle.dataset.roll);
         const student = students.find(s => s.roll === roll);
-        const status = toggle.classList.contains('present') ? 'Present' : 'Absent';
+        
+        // Check if student is on leave for this date
+        const leaveRecord = leaveData.find(l => l.roll === roll && l.date === selectedDate);
+        const status = leaveRecord ? leaveRecord.status : 
+                      (toggle.classList.contains('present') ? 'Present' : 'Absent');
         
         if (student) {
             attendanceData.push({
@@ -621,6 +808,7 @@ function saveAttendance() {
         }
     });
     
+    // Rest of the function remains the same...
     // Check if attendance already exists for this date
     const existingRecordIndex = attendanceRecords.findIndex(record => record.date === selectedDate);
     
@@ -750,9 +938,166 @@ function closeAttendanceDetailModal() {
 }
 
 /**
+ * Generate report for all students
+ * @param {string} month - The month in YYYY-MM format
+ */
+function generateAllStudentsReport(month) {
+    if (students.length === 0) {
+        showToast('No students found to generate report', 'error');
+        return;
+    }
+    
+    // Parse the selected month
+    const [year, monthNum] = month.split('-').map(Number);
+    const startDate = new Date(year, monthNum - 1, 1);
+    const endDate = new Date(year, monthNum, 0);
+    
+    // Filter attendance records for the selected month
+    const monthRecords = attendanceRecords.filter(record => {
+        const recordDate = new Date(record.date);
+        return recordDate >= startDate && recordDate <= endDate;
+    });
+    
+    // Generate HTML for all students report
+    let reportHTML = `
+        <div class="report-header">
+            <h3>Attendance Report - All Students</h3>
+            <div>Month: ${formatMonth(month)} | Class: ${currentClass} - Section ${currentSection}</div>
+            <div>Total Students: ${students.length} | Total Records: ${monthRecords.length} days</div>
+        </div>
+        
+        <div class="all-students-report">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Roll No</th>
+                        <th>Student Name</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                        <th>Leave</th>
+                        <th>Total Days</th>
+                        <th>Attendance %</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    // Calculate statistics for each student
+    students.forEach(student => {
+        let presentCount = 0;
+        let absentCount = 0;
+        let leaveCount = 0;
+        
+        monthRecords.forEach(record => {
+            const studentRecord = record.students.find(s => s.roll === student.roll);
+            if (studentRecord) {
+                if (studentRecord.status === 'Present') {
+                    presentCount++;
+                } else if (studentRecord.status === 'Leave') {
+                    leaveCount++;
+                } else {
+                    absentCount++;
+                }
+            } else {
+                // Check if student was on leave for this date
+                const leaveRecord = leaveData.find(l => l.roll === student.roll && l.date === record.date);
+                if (leaveRecord && leaveRecord.status === 'Leave') {
+                    leaveCount++;
+                } else {
+                    absentCount++;
+                }
+            }
+        });
+        
+        const totalDays = presentCount + absentCount + leaveCount;
+        const percentage = totalDays > 0 ? Math.round((presentCount / totalDays) * 100) : 0;
+        
+        // Determine status based on percentage
+        let status = 'Poor';
+        let statusClass = 'poor';
+        if (percentage >= 90) {
+            status = 'Excellent';
+            statusClass = 'excellent';
+        } else if (percentage >= 75) {
+            status = 'Good';
+            statusClass = 'good';
+        } else if (percentage >= 60) {
+            status = 'Average';
+            statusClass = 'average';
+        }
+        
+        reportHTML += `
+            <tr>
+                <td>${student.roll}</td>
+                <td>${student.name}</td>
+                <td>${presentCount}</td>
+                <td>${absentCount}</td>
+                <td>${leaveCount}</td>
+                <td>${totalDays}</td>
+                <td>
+                    <div class="percentage-display">
+                        <span>${percentage}%</span>
+                        <div class="progress-bar small">
+                            <div class="progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="status-badge ${statusClass}">${status}</span></td>
+            </tr>
+        `;
+    });
+    
+    reportHTML += `
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="report-summary">
+            <h4>Class Summary</h4>
+            <div class="summary-stats">
+    `;
+    
+    // Calculate class summary
+    const totalPresent = students.reduce((sum, student) => {
+        const studentPresent = monthRecords.reduce((studentSum, record) => {
+            const studentRecord = record.students.find(s => s.roll === student.roll);
+            return studentSum + (studentRecord && studentRecord.status === 'Present' ? 1 : 0);
+        }, 0);
+        return sum + studentPresent;
+    }, 0);
+    
+    const totalPossibleDays = students.length * monthRecords.length;
+    const classPercentage = totalPossibleDays > 0 ? Math.round((totalPresent / totalPossibleDays) * 100) : 0;
+    
+    reportHTML += `
+                <div class="summary-stat">
+                    <div class="summary-value">${students.length}</div>
+                    <div class="summary-label">Total Students</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-value">${monthRecords.length}</div>
+                    <div class="summary-label">Records Days</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-value">${classPercentage}%</div>
+                    <div class="summary-label">Class Average</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    reportResults.innerHTML = reportHTML;
+}
+
+/**
  * Generate a student report for the selected month
  */
 function generateStudentReport() {
+  
+  // FIX: Sort records by date
+    attendanceRecords = attendanceRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
     const studentId = studentSelect.value;
     const month = reportMonth.value;
     
@@ -761,6 +1106,13 @@ function generateStudentReport() {
         return;
     }
     
+    // Handle "Select All" option
+    if (studentId === 'all') {
+        generateAllStudentsReport(month);
+        return;
+    }
+    
+    // Original single student report code
     const student = students.find(s => s.id === studentId);
     if (!student) {
         showToast('Student not found', 'error');
@@ -781,29 +1133,38 @@ function generateStudentReport() {
     // Calculate attendance statistics
     let presentCount = 0;
     let absentCount = 0;
+    let leaveCount = 0;
     
     monthRecords.forEach(record => {
         const studentRecord = record.students.find(s => s.roll === student.roll);
         if (studentRecord) {
             if (studentRecord.status === 'Present') {
                 presentCount++;
+            } else if (studentRecord.status === 'Leave') {
+                leaveCount++;
             } else {
                 absentCount++;
             }
         } else {
-            // If student not found in record, count as absent
-            absentCount++;
+            // Check if student was on leave for this date
+            const leaveRecord = leaveData.find(l => l.roll === student.roll && l.date === record.date);
+            if (leaveRecord && leaveRecord.status === 'Leave') {
+                leaveCount++;
+            } else {
+                // If student not found in record and not on leave, count as absent
+                absentCount++;
+            }
         }
     });
     
-    const totalDays = presentCount + absentCount;
+    const totalDays = presentCount + absentCount + leaveCount;
     const percentage = totalDays > 0 ? Math.round((presentCount / totalDays) * 100) : 0;
     
     // Generate HTML for report
     let reportHTML = `
         <div class="report-header">
             <h3>Attendance Report for ${student.name}</h3>
-            <div>Month: ${formatMonth(month)}</div>
+            <div>Month: ${formatMonth(month)} | Roll No: ${student.roll}</div>
         </div>
         
         <div class="report-stats">
@@ -814,6 +1175,10 @@ function generateStudentReport() {
             <div class="report-stat absent">
                 <div class="stat-number">${absentCount}</div>
                 <div class="stat-description">Days Absent</div>
+            </div>
+            <div class="report-stat leave">
+                <div class="stat-number">${leaveCount}</div>
+                <div class="stat-description">Days on Leave</div>
             </div>
             <div class="report-stat percentage">
                 <div class="stat-number">${percentage}%</div>
@@ -833,8 +1198,15 @@ function generateStudentReport() {
     } else {
         monthRecords.forEach(record => {
             const studentRecord = record.students.find(s => s.roll === student.roll);
-            const status = studentRecord ? studentRecord.status : 'Absent';
-            const statusClass = status === 'Present' ? 'present' : 'absent';
+            let status = studentRecord ? studentRecord.status : 'Absent';
+            
+            // Override status with leave data if student was on leave
+            const leaveRecord = leaveData.find(l => l.roll === student.roll && l.date === record.date);
+            if (leaveRecord && leaveRecord.status === 'Leave') {
+                status = 'Leave';
+            }
+            
+            const statusClass = status.toLowerCase();
             
             reportHTML += `
                 <div class="daily-record ${statusClass}">
@@ -948,25 +1320,38 @@ function exportReportPDF() {
         return;
     }
     
+    // Handle "Select All" export
+    if (studentId === 'all') {
+        exportAllStudentsReportPDF(month);
+        return;
+    }
+    
+    // Original single student export code...
     const student = students.find(s => s.id === studentId);
     if (!student) {
         showToast('Student not found', 'error');
         return;
     }
     
-    // Use jsPDF to create PDF
+    // Rest of the original export code...
+}
+
+/**
+ * Export all students report as PDF
+ */
+function exportAllStudentsReportPDF(month) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     
     // Add title
     doc.setFontSize(20);
-    doc.text(`Student Attendance Report`, 20, 20);
+    doc.text(`All Students Attendance Report`, 20, 20);
     
-    // Add student and month info
+    // Add class and month info
     doc.setFontSize(12);
-    doc.text(`Student: ${student.name} (Roll No: ${student.roll})`, 20, 35);
-    doc.text(`Class: ${currentClass} - Section: ${currentSection}`, 20, 45);
-    doc.text(`Month: ${formatMonth(month)}`, 20, 55);
+    doc.text(`Class: ${currentClass} - Section: ${currentSection}`, 20, 35);
+    doc.text(`Month: ${formatMonth(month)}`, 20, 45);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 55);
     
     // Parse the selected month
     const [year, monthNum] = month.split('-').map(Number);
@@ -979,58 +1364,68 @@ function exportReportPDF() {
         return recordDate >= startDate && recordDate <= endDate;
     });
     
-    // Calculate attendance statistics
-    let presentCount = 0;
-    let absentCount = 0;
-    
-    monthRecords.forEach(record => {
-        const studentRecord = record.students.find(s => s.roll === student.roll);
-        if (studentRecord) {
-            if (studentRecord.status === 'Present') {
-                presentCount++;
+    // Create table data
+    const tableData = students.map(student => {
+        let presentCount = 0;
+        let absentCount = 0;
+        let leaveCount = 0;
+        
+        monthRecords.forEach(record => {
+            const studentRecord = record.students.find(s => s.roll === student.roll);
+            if (studentRecord) {
+                if (studentRecord.status === 'Present') {
+                    presentCount++;
+                } else if (studentRecord.status === 'Leave') {
+                    leaveCount++;
+                } else {
+                    absentCount++;
+                }
             } else {
-                absentCount++;
+                const leaveRecord = leaveData.find(l => l.roll === student.roll && l.date === record.date);
+                if (leaveRecord && leaveRecord.status === 'Leave') {
+                    leaveCount++;
+                } else {
+                    absentCount++;
+                }
             }
-        } else {
-            absentCount++;
-        }
-    });
-    
-    const totalDays = presentCount + absentCount;
-    const percentage = totalDays > 0 ? Math.round((presentCount / totalDays) * 100) : 0;
-    
-    // Add statistics
-    doc.text(`Present: ${presentCount} days`, 20, 70);
-    doc.text(`Absent: ${absentCount} days`, 20, 80);
-    doc.text(`Total: ${totalDays} days`, 20, 90);
-    doc.text(`Attendance Rate: ${percentage}%`, 20, 100);
-    
-    // Create table data for daily attendance
-    const tableData = monthRecords.map(record => {
-        const studentRecord = record.students.find(s => s.roll === student.roll);
-        const status = studentRecord ? studentRecord.status : 'Absent';
+        });
+        
+        const totalDays = presentCount + absentCount + leaveCount;
+        const percentage = totalDays > 0 ? Math.round((presentCount / totalDays) * 100) : 0;
         
         return [
-            formatDate(record.date),
-            status
+            student.roll.toString(),
+            student.name,
+            presentCount.toString(),
+            absentCount.toString(),
+            leaveCount.toString(),
+            totalDays.toString(),
+            `${percentage}%`
         ];
     });
     
     // Add table
-    if (tableData.length > 0) {
-        doc.autoTable({
-            startY: 110,
-            head: [['Date', 'Status']],
-            body: tableData,
-            theme: 'grid',
-            headStyles: { fillColor: [52, 152, 219] },
-            styles: { fontSize: 10 }
-        });
-    }
+    doc.autoTable({
+        startY: 65,
+        head: [['Roll No', 'Name', 'Present', 'Absent', 'Leave', 'Total', 'Attendance %']],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [52, 152, 219] },
+        styles: { fontSize: 9 },
+        columnStyles: {
+            0: { cellWidth: 20 },
+            1: { cellWidth: 50 },
+            2: { cellWidth: 20 },
+            3: { cellWidth: 20 },
+            4: { cellWidth: 20 },
+            5: { cellWidth: 20 },
+            6: { cellWidth: 25 }
+        }
+    });
     
     // Save the PDF
-    doc.save(`report_${student.name}_${month}.pdf`);
-    showToast('Report exported as PDF successfully', 'success');
+    doc.save(`all_students_report_${currentClass}_${currentSection}_${month}.pdf`);
+    showToast('All students report exported as PDF successfully', 'success');
 }
 
 /**
@@ -1102,18 +1497,30 @@ function clearAllData() {
     // Clear data from localStorage
     const studentsKey = `students_${currentClass}_${currentSection}`;
     const attendanceKey = `attendance_${currentClass}_${currentSection}`;
+    const leaveKey = `leave_${currentClass}_${currentSection}`;
+    const marksKey = `marks_${currentClass}_${currentSection}`;
+    const feeKey = `fee_${currentClass}_${currentSection}`;
     
     localStorage.removeItem(studentsKey);
     localStorage.removeItem(attendanceKey);
+    localStorage.removeItem(leaveKey);
+    localStorage.removeItem(marksKey);
+    localStorage.removeItem(feeKey);
     
     // Reset in-memory data
     students = [];
     attendanceRecords = [];
+    leaveData = [];
+    marksData = [];
+    feeData = [];
     
     // Update UI
     renderStudents();
     renderAttendance();
     renderAttendanceHistory();
+    renderLeaveList(); // Add this
+    renderMarksList(); // Add this
+    renderFeeList();   // Add this
     populateStudentSelect();
     
     showToast('All data cleared for this class', 'success');
@@ -1204,9 +1611,284 @@ function formatMonth(monthStr) {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
 }
 
-// Add CSS for Font Awesome icons (since we're using them in the UI)
+// --- Create style element first ---
 const style = document.createElement('style');
-style.textContent = `
+style.textContent = ""; // initialize
+document.head.appendChild(style);
+
+// --- Add the extra CSS blocks AFTER style is created ---
+
+// Add CSS for leave records
+const additionalStyle = `
+   /* Leave Item Card */
+.leave-item {
+    background: #ffffff;
+    padding: 14px 18px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 5px solid #f1c40f; /* Yellow accent for Leave */
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.07);
+    font-size: 15px;
+    color: #2c3e50;
+    margin-bottom: 12px;
+    transition: 0.25s ease;
+}
+
+.leave-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 6px 15px rgba(0,0,0,0.12);
+}
+
+/* Student text */
+.leave-item span {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* Dropdown Select */
+.leave-item select {
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #f8f9fa;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    outline: none;
+}
+
+/* Hover effect */
+.leave-item select:hover {
+    background: #eef2f3;
+}
+
+/* Focus effect */
+.leave-item select:focus {
+    border-color: #3498db;
+    box-shadow: 0px 0px 5px rgba(52,152,219,0.5);
+}
+
+`;
+style.textContent += additionalStyle;
+
+// Add CSS for all students report
+const allStudentsReportStyle = `
+/* Main container */
+#marksList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* Each marks row */
+.marks-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 14px 18px;
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+    transition: 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Left colored accent */
+.marks-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    background: var(--gradient-primary);
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+/* Data text */
+.marks-item span {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Icons for clarity */
+.marks-item span::before {
+    content: "📘";
+    font-size: 18px;
+}
+
+/* Hover animation */
+.marks-item:hover {
+    transform: scale(1.015);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+}
+
+/* Delete button */
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Delete button icon */
+.delete-btn::before {
+    content: "🗑️";
+    font-size: 14px;
+}
+
+/* Hover effect */
+.delete-btn:hover {
+    background-color: #c0392b;
+    transform: scale(1.1);
+}
+
+
+    .all-students-report {
+        margin: 20px 0;
+        overflow-x: auto;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .report-table th {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 12px 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+
+    .report-table td {
+        padding: 10px 15px;
+        border-bottom: 1px solid var(--light-color);
+    }
+
+    .report-table tr:hover {
+        background-color: rgba(52, 152, 219, 0.05);
+    }
+
+    .percentage-display {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .progress-bar.small {
+        width: 80px;
+        height: 8px;
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-badge.excellent {
+        background-color: rgba(46, 204, 113, 0.2);
+        color: #27ae60;
+    }
+
+    .status-badge.good {
+        background-color: rgba(52, 152, 219, 0.2);
+        color: #2980b9;
+    }
+
+    .status-badge.average {
+        background-color: rgba(241, 196, 15, 0.2);
+        color: #f39c12;
+    }
+
+    .status-badge.poor {
+        background-color: rgba(231, 76, 60, 0.2);
+        color: #c0392b;
+    }
+
+    .report-summary {
+        margin-top: 30px;
+        padding: 20px;
+        background: var(--light-color);
+        border-radius: var(--border-radius);
+        text-align: center;
+    }
+
+    .report-stat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+}
+
+    .summary-stat {
+        text-align: center;
+    }
+
+    .summary-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    .summary-label {
+        font-size: 14px;
+        color: var(--dark-color);
+        margin-top: 5px;
+    }
+    
+    .summary-stats {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    @media (max-width: 768px) {
+        .report-table {
+            font-size: 14px;
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 8px 10px;
+        }
+
+        .summary-stats {
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+`;
+style.textContent += allStudentsReportStyle;
+
+// --- Base CSS ---
+style.textContent += `
     .fas {
         font-family: 'Font Awesome 5 Free';
         font-weight: 900;
@@ -1249,16 +1931,21 @@ style.textContent = `
     }
     
     .daily-record {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 15px;
-        border-radius: var(--border-radius);
-        background-color: var(--light-color);
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    }
+    
+    .daily-record.leave {
+    background-color: rgba(241, 196, 15, 0.1);
+    border-left: 4px solid #f1c40f;
+      
     }
     
     .daily-record.present {
         background-color: rgba(46, 204, 113, 0.1);
-        border-left: 4px solid var(--success-color);
+        border-left: 4px solid #4caf50;
     }
     
     .daily-record.absent {
@@ -1266,4 +1953,3 @@ style.textContent = `
         border-left: 4px solid var(--danger-color);
     }
 `;
-document.head.appendChild(style);
