@@ -41,7 +41,10 @@
                 <button class="tab-btn active" data-tab="students">Students</button>
                 <button class="tab-btn" data-tab="attendance">Mark Attendance</button>
                 <button class="tab-btn" data-tab="history">Attendance History</button>
-                <button class="tab-btn" data-tab="reports">Student Reports</button>
+                <button class="tab-btn" data-tab="reports">Student Reports</button> 
+                <button class="tab-btn" data-tab="marks">Student Marks</button>
+                <button class="tab-btn" data-tab="leave">Student Leave</button>
+                <button class="tab-btn" data-tab="fees">Student Fee</button>
             </nav>
 
             <!-- Students Tab -->
@@ -112,6 +115,79 @@
                 
                 <div id="reportResults" class="report-results"></div>
             </section>
+            
+            <section id="fees" class="tab-content">
+    <div class="section-header">
+        <h2>Student Fee Management</h2>
+    </div>
+
+    <div class="form-group">
+        <label>Select Student:</label>
+        <select id="feeStudentSelect"></select>
+    </div>
+
+    <div class="form-group">
+        <label>Fee Status:</label>
+        <select id="feeStatus">
+            <option value="paid">Paid</option>
+            <option value="unpaid">Not Paid</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Amount Paid:</label>
+        <input type="number" id="feeAmount" min="0">
+    </div>
+
+    <button id="saveFeeBtn" class="btn-primary">Save Fee</button>
+
+    <h3>Fee Records</h3>
+    <div id="feeList"></div>
+</section>
+
+            
+            <section id="marks" class="tab-content">
+    <div class="section-header">
+        <h2>Student Marks Entry</h2>
+    </div>
+
+    <div class="form-group">
+        <label>Select Student:</label>
+        <select id="marksStudentSelect"></select>
+    </div>
+
+    <div class="form-group">
+        <label>Select Exam Type:</label>
+        <select id="examType">
+            <option value="pt1">Periodic Test 1</option>
+            <option value="pt2">Periodic Test 2</option>
+            <option value="pt3">Periodic Test 3</option>
+            <option value="half">Half Yearly</option>
+            <option value="pre-board">Pre-Board</option>
+            <option value="final">Final Exam</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Marks:</label>
+        <input type="number" id="examMarks" min="0">
+    </div>
+
+    <button id="saveMarksBtn" class="btn-primary">Save Marks</button>
+
+    <h3>Saved Marks</h3>
+    <div id="marksList"></div>
+</section>
+
+            
+            <section id="leave" class="tab-content">
+    <div class="section-header">
+        <h2>Student Leave Management</h2>
+    </div>
+
+    <div id="leaveList" class="leave-list"></div>
+</section>
+
 
             <!-- Export Section -->
             <section class="export-section">
