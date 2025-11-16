@@ -590,11 +590,15 @@ input:focus, select:focus {
 }
 
 .report-stat.present::before {
-    background: var(--gradient-success);
+    background: #4caf50;
 }
 
 .report-stat.absent::before {
     background: var(--gradient-danger);
+}
+
+.report-stat.leave::before {
+    background: #f1c40f;
 }
 
 .report-stat.percentage::before {
@@ -613,11 +617,15 @@ input:focus, select:focus {
 }
 
 .present .stat-number {
-    color: var(--success-color);
+    color: #4caf50;
 }
 
 .absent .stat-number {
     color: var(--danger-color);
+}
+
+.leave .stat-number {
+    color: #f1c40f;
 }
 
 .percentage .stat-number {
@@ -641,7 +649,7 @@ input:focus, select:focus {
 
 .progress-fill {
     height: 100%;
-    background: var(--gradient-success);
+    background: var(--primary-color);
     transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 6px;
 }
@@ -863,4 +871,88 @@ input:focus, select:focus {
         left: 15px;
         max-width: none;
     }
+}
+
+
+/* ============================
+   Leave Management Section
+============================= */
+
+#leave {
+    padding: 15px;
+}
+
+#leave .section-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+/* Leave List Container */
+.leave-list {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Leave Item Card */
+.leave-item {
+    background: #ffffff;
+    padding: 15px 18px;
+    border-radius: 12px;
+    border-left: 5px solid #3498db;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.25s ease;
+}
+
+.leave-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 6px 15px rgba(0,0,0,0.12);
+}
+
+/* Leave Info Text */
+.leave-info {
+    font-size: 15px;
+    color: #34495e;
+    line-height: 1.4;
+}
+
+/* Leave Actions (Delete Button) */
+.leave-actions button {
+    padding: 7px 12px;
+    background: #e74c3c;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.leave-actions button:hover {
+    background: #c0392b;
+}
+
+/* Fee Records Section */
+#feeList {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 5px;
+}
+
+/* Fee Records Title */
+#fees h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    position: relative;
 }
