@@ -45,6 +45,7 @@
                 <button class="tab-btn" data-tab="marks">Student Marks</button>
                 <button class="tab-btn" data-tab="leave">Student Leave</button>
                 <button class="tab-btn" data-tab="fees">Student Fee</button>
+                <button class="tab-btn" data-tab="instructions">Instructions</button>
             </nav>
 
             <!-- Students Tab -->
@@ -138,6 +139,17 @@
         <label>Amount Paid:</label>
         <input type="number" id="feeAmount" min="0">
     </div>
+    
+    <div class="form-group">
+    <label>Fee Duration:</label>
+    <select id="feeDuration">
+        <option value="1-month">1 Month</option>
+        <option value="3-months">3 Months</option>
+        <option value="6-months">6 Months</option>
+        <option value="1-year">1 Year</option>
+    </select>
+</div>
+
 
     <button id="saveFeeBtn" class="btn-primary">Save Fee</button>
 
@@ -188,6 +200,80 @@
     <div id="leaveList" class="leave-list"></div>
 </section>
 
+
+<section id="instructions" class="tab-content">
+    <div class="section-header">
+        <h2>How to Use This Attendance System / इस सिस्टम का उपयोग कैसे करें</h2>
+    </div>
+
+    <div class="instructions-box">
+
+        <h3>📌 Step 1 — Create or Load Class / कक्षा बनाएं या लोड करें</h3>
+        <p>
+            Enter your Class Name and Section, then click "Load/Create Class".
+            यह जानकारी भरें और "Load/Create Class" दबाएं।
+        </p>
+
+        <h3>📌 Step 2 — Add Students / छात्र जोड़ें</h3>
+        <p>
+            Go to "Students" tab → Click "Add Student" → Enter name, roll number & optional photo.
+            "Students" टैब में जाएं, "Add Student" दबाएं और विवरण भरें।
+        </p>
+
+        <h3>📌 Step 3 — Mark Attendance / उपस्थिति दर्ज करें</h3>
+        <p>
+            Open "Mark Attendance" tab → Select date → Mark Present/Absent → Save.
+            "Mark Attendance" टैब खोलें, तारीख चुनें और उपस्थिति सेव करें।
+        </p>
+        <p>
+            👉 If Present/Absent/Leave is not showing, click "Update Attendance" button or refresh the page.
+            अगर Present/Absent/Leave नहीं दिख रहा है तो "Update Attendance" दबाएं या पेज reload/refresh करें।
+        </p>
+
+        <h3>📌 Step 4 — View Attendance History / उपस्थिति इतिहास देखें</h3>
+        <p>
+            Go to "Attendance History" to view daily records.
+            दैनिक रिकॉर्ड देखने के लिए "Attendance History" में जाएं।
+        </p>
+
+        <h3>📌 Step 5 — Generate Report / रिपोर्ट बनाएं</h3>
+        <p>
+            Select a student & month → Click "Generate Report".
+            छात्र और महीना चुनें → "Generate Report" दबाएं।
+        </p>
+
+        <h3>📌 Step 6 — Fees, Marks & Leave Management / फीस, मार्क्स और अवकाश प्रबंधन</h3>
+        <p>
+            Use respective tabs to save fee status, exam marks & leave requests.
+            संबंधित टैब में फीस, मार्क्स और अवकाश दर्ज करें।
+        </p>
+
+        <h3>📌 Step 7 — Export Data / डेटा डाउनलोड करें</h3>
+        <p>
+            Export Students, Attendance & Reports using Export section.
+            Export सेक्शन से CSV और PDF डाउनलोड करें।
+        </p>
+
+        <h3>✅ Auto Save Feature / स्वतः सेव सुविधा</h3>
+        <p>
+            All data is auto-saved in browser — no internet required.
+            सारा डेटा ब्राउज़र में स्वतः सेव रहता है — इंटरनेट जरूरी नहीं।
+        </p>
+
+        <h3>⚠️ Warning / चेतावनी</h3>
+        <p>
+            Do NOT clear browser storage, otherwise data will be erased.
+            ब्राउज़र स्टोरेज क्लियर न करें, वरना डेटा हट जाएगा।
+        </p>
+
+        <h3>🎯 Best Use / बेहतर उपयोग</h3>
+        <p>
+            Use in Chrome or Laptop for best experience.
+            बेहतर अनुभव के लिए Chrome या Laptop का उपयोग करें।
+        </p>
+
+    </div>
+</section>
 
             <!-- Export Section -->
             <section class="export-section">
