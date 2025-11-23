@@ -11,6 +11,8 @@ let leaveData = [];
 let marksData = [];
 let feeData = [];
 
+const studentCategorySelect = document.getElementById('studentCategory');
+
 
 // DOM Elements
 const classSetupSection = document.getElementById('classSetup');
@@ -489,6 +491,8 @@ function renderStudents() {
             <div class="student-info">
                 <div class="student-name">${student.name}</div>
                 <div class="student-roll">Roll No: ${student.roll}</div>
+                <div class="student-category">Category: ${student.category || 'General'}</div> <!-- NEW LINE -->
+
             </div>
             <div class="student-actions">
                 <button class="action-btn edit" onclick="editStudent('${student.id}')">
@@ -516,6 +520,7 @@ function openAddStudentModal() {
     editingStudentId = null;
     modalTitle.textContent = 'Add Student';
     studentForm.reset();
+    studentCategorySelect.value = 'General'; // NEW LINE - DEFAULT SET
     imagePreview.innerHTML = '';
     studentModal.classList.remove('hidden');
 }
@@ -532,6 +537,7 @@ function editStudent(studentId) {
     modalTitle.textContent = 'Edit Student';
     studentNameInput.value = student.name;
     studentRollInput.value = student.roll;
+    studentCategorySelect.value = student.category || 'General'; // NEW LINE
     
     if (student.image) {
         imagePreview.innerHTML = `<img src="${student.image}" alt="Preview">`;
@@ -573,8 +579,10 @@ function saveStudent(e) {
     
     const name = studentNameInput.value.trim();
     const roll = parseInt(studentRollInput.value);
+    const category = studentCategorySelect.value; // NEW LINE
+
     
-    if (!name || !roll) {
+   if (!name || !roll || !category) { // MODIFIED CONDITION
         showToast('Please fill in all required fields', 'error');
         return;
     }
@@ -593,7 +601,7 @@ function saveStudent(e) {
         const reader = new FileReader();
         reader.onload = function(e) {
             imageBase64 = e.target.result;
-            completeStudentSave(name, roll, imageBase64);
+            completeStudentSave(name, roll, category, imageBase64); // MODIFIED
         };
         reader.readAsDataURL(file);
     } else {
@@ -602,7 +610,7 @@ function saveStudent(e) {
             const existingStudent = students.find(s => s.id === editingStudentId);
             imageBase64 = existingStudent ? existingStudent.image : '';
         }
-        completeStudentSave(name, roll, imageBase64);
+        completeStudentSave(name, roll, category, imageBase64); // MODIFIED
     }
 }
 
@@ -612,7 +620,7 @@ function saveStudent(e) {
  * @param {number} roll - Student roll number
  * @param {string} imageBase64 - Student image as base64 string
  */
-function completeStudentSave(name, roll, imageBase64) {
+function completeStudentSave(name, roll, category, imageBase64) {
     if (editingStudentId) {
         // Update existing student
         const studentIndex = students.findIndex(s => s.id === editingStudentId);
@@ -621,6 +629,7 @@ function completeStudentSave(name, roll, imageBase64) {
                 ...students[studentIndex],
                 name,
                 roll,
+                category, // NEW LINE
                 image: imageBase64
             };
         }
@@ -631,6 +640,7 @@ function completeStudentSave(name, roll, imageBase64) {
             id: generateId(),
             name,
             roll,
+            category, // NEW LINE
             image: imageBase64
         };
         students.push(newStudent);
@@ -1235,8 +1245,13 @@ function exportStudentsCSV() {
         return;
     }
     
-    // Create CSV header
-    let csvContent = 'Roll No,Name\n';
+   // CSV HEADER MEIN CATEGORY ADD KARO:
+let csvContent = 'Roll No,Name,Category\n';
+
+// STUDENT DATA MEIN CATEGORY ADD KARO:
+students.forEach(student => {
+    csvContent += `${student.roll},${student.name},${student.category || 'General'}\n`;
+});
     
     // Add student data
     students.forEach(student => {
