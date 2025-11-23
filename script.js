@@ -247,10 +247,15 @@ document.getElementById("saveFeeBtn").addEventListener("click", () => {
     const roll = document.getElementById("feeStudentSelect").value;
     const status = document.getElementById("feeStatus").value;
     const amount = document.getElementById("feeAmount").value;
+    const feeDuration = document.getElementById("feeDuration").value;
 
-    feeData.push({ roll, status, amount });
+    feeData.push({ roll, status, amount, feeDuration });
     saveFeeData();
     renderFeeList();
+    
+    // Reset fields
+    document.getElementById("feeAmount").value = "";
+    document.getElementById("feeDuration").value = "1-month";
 });
 
 function renderFeeList() {
@@ -260,7 +265,7 @@ function renderFeeList() {
     feeData.forEach((f, i) => {
         div.innerHTML += `
             <div class="fee-item marks-item">
-                <span>Roll: ${f.roll} | Status: ${f.status} | Amount: ${f.amount}</span>
+                <span>Roll: ${f.roll} | Status: ${f.status} | Amount: ${f.amount} | Duration: ${f.feeDuration}</span>
                 <button class="delete-btn" onclick="deleteFee(${i})">Delete</button>
             </div>
         `;
