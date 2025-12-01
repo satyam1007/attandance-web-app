@@ -10,6 +10,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
+ <!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <h2 class="sidebar-title">AttendEasy 📝</h2>
+    <ul class="sidebar-menu">
+        <li data-tab="instructions">Instructions</li>
+        <li data-tab="students">Students</li>
+        <li data-tab="attendance">Mark Attendance</li>
+        <li data-tab="history">Attendance History</li>
+        <li data-tab="reports">Student Reports</li>
+        <li data-tab="marks">Student Marks</li>
+        <li data-tab="leave">Student Leave</li>
+        <li data-tab="fees">Student Fee</li>
+    </ul>
+</div>
+
+<!-- MOBILE HAMBURGER BUTTON -->
+<div id="hamburger" class="hamburger">
+    ☰
+</div>
+
+<!-- SCREEN OVERLAY WHEN SIDEBAR OPENS -->
+<div id="overlay" class="overlay hidden"></div>
+
     <div class="container">
         <!-- Header Section -->
         <header>
@@ -36,17 +59,17 @@
 
         <!-- Main App (hidden initially) -->
         <main id="mainApp" class="hidden">
-            <!-- Navigation Tabs -->
-            <nav class="tabs">
-                <button class="tab-btn active" data-tab="students">Students</button>
-                <button class="tab-btn" data-tab="attendance">Mark Attendance</button>
-                <button class="tab-btn" data-tab="history">Attendance History</button>
-                <button class="tab-btn" data-tab="reports">Student Reports</button> 
-                <button class="tab-btn" data-tab="marks">Student Marks</button>
-                <button class="tab-btn" data-tab="leave">Student Leave</button>
-                <button class="tab-btn" data-tab="fees">Student Fee</button>
-                <button class="tab-btn" data-tab="instructions">Instructions</button>
-            </nav>
+             <!--Navigation Tabs -->
+            <!--<nav class="tabs">-->
+            <!--    <button class="tab-btn active" data-tab="students">Students</button>-->
+            <!--    <button class="tab-btn" data-tab="attendance">Mark Attendance</button>-->
+            <!--    <button class="tab-btn" data-tab="history">Attendance History</button>-->
+            <!--    <button class="tab-btn" data-tab="reports">Student Reports</button> -->
+            <!--    <button class="tab-btn" data-tab="marks">Student Marks</button>-->
+            <!--    <button class="tab-btn" data-tab="leave">Student Leave</button>-->
+            <!--    <button class="tab-btn" data-tab="fees">Student Fee</button>-->
+            <!--    <button class="tab-btn" data-tab="instructions">Instructions</button>-->
+            <!--</nav>-->
 
             <!-- Students Tab -->
             <section id="students" class="tab-content active">
