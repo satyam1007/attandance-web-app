@@ -1097,7 +1097,7 @@ input:focus, select:focus {
 
 /* HAMBURGER BUTTON */
 .hamburger {
-    /*display: none;*/
+    display: none;
     font-size: 28px;
     cursor: pointer;
     z-index: 1001;    /* above sidebar */
