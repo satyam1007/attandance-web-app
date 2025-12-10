@@ -10,6 +10,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
+<!-- STARTUP SCHOOL SELECTION SCREEN -->
+<div id="schoolSelector" class="school-selector hidden">
+    <div class="selector-content">
+        
+        <!-- Close Button -->
+        <button id="closeSelector" class="selector-close">✖</button>
+
+        <h2>Select Your School Type</h2>
+
+        <div class="selector-cards">
+            <div class="selector-card" data-link="kinder.html">
+                <h3>Kindergarten</h3>
+            </div>
+            <div class="selector-card" data-link="primary.html">
+                <h3>Primary Wing</h3>
+            </div>
+            <div class="selector-card" data-link="senior.html">
+                <h3>Senior School</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
  <!-- SIDEBAR -->
 <div id="sidebar" class="sidebar">
     <h2 class="sidebar-title">AttendEasy 📝</h2>
@@ -22,6 +45,7 @@
         <li data-tab="marks">Student Marks</li>
         <li data-tab="leave">Student Leave</li>
         <li data-tab="fees">Student Fee</li>
+        <button id="changeSchoolTypeBtn" class="btn-secondary">Change School Type</button>
     </ul>
 </div>
 
