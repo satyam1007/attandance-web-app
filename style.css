@@ -1156,3 +1156,161 @@ input:focus, select:focus {
         width: calc(100% - 240px);
     }
 }
+/* ============================
+   STARTUP SCHOOL SELECTOR
+============================= */
+
+.school-selector {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeInOverlay 0.3s ease-in-out;
+}
+
+/* Center Modal */
+.selector-content {
+    width: 92%;
+    max-width: 520px;
+    background: #ffffff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow-lg);
+    padding: 35px 30px 30px;
+    position: relative;
+    animation: popupScale 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+}
+
+/* Close Button */
+.selector-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--gradient-danger);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(247, 37, 133, 0.3);
+}
+
+.selector-close:hover {
+    transform: rotate(90deg) scale(1.05);
+}
+
+/* Heading */
+.selector-content h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 25px;
+}
+
+/* Card Container */
+.selector-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+/* Individual Cards */
+.selector-card {
+    background: #fff;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--gray-light);
+    box-shadow: var(--box-shadow);
+    padding: 22px 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Top Gradient Line */
+.selector-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: var(--gradient-primary);
+}
+
+/* Hover Effect */
+.selector-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: var(--box-shadow-lg);
+    border-color: var(--primary-color);
+}
+
+/* Card Title */
+.selector-card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+/* Optional Subtitle (if you add later) */
+.selector-card p {
+    font-size: 0.9rem;
+    color: var(--gray-color);
+    margin-top: 6px;
+}
+
+/* Highlight selected / active */
+.selector-card.active {
+    background: var(--gradient-primary);
+    color: #fff;
+}
+
+.selector-card.active h3 {
+    color: #fff;
+}
+
+/* Animations */
+@keyframes popupScale {
+    from {
+        opacity: 0;
+        transform: scale(0.85) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .selector-cards {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .selector-content {
+        padding: 28px 20px;
+    }
+
+    .selector-content h2 {
+        font-size: 1.4rem;
+    }
+}
