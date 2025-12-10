@@ -335,12 +335,14 @@ function loadClassData(className, sectionName) {
     // Load data from localStorage
     loadStudents();
     loadAttendanceRecords();
-    loadLeaveData(); // Add this line
-    loadMarksData(); // Add this line
-    loadFeeData();   // Add this line
+    loadLeaveData();
+    loadMarksData();
+    loadFeeData();
     
     // Render initial views
     renderStudents();
+    renderAttendance();
+    renderAttendanceHistory();
     fillStudentDropdowns();
     populateStudentSelect();
     
@@ -653,7 +655,12 @@ function completeStudentSave(name, roll, category, imageBase64) {
     
     // Update UI
     renderStudents();
+    renderAttendance();        
+    renderAttendanceHistory();
     populateStudentSelect();
+    
+    fillStudentDropdowns();        // ← Marks, Fee, Reports dropdown update
+    populateStudentSelect();       // ← Report wala student select update
     
     // Close modal
     closeStudentModal();
@@ -680,8 +687,17 @@ function deleteStudent(studentId) {
     saveStudents();
     saveAttendanceRecords();
     
+    // YE 4 LINES ADD KAR DE
+renderAttendance();           // Mark Attendance list update ho jayegi
+renderAttendanceHistory();    // History bhi update
+fillStudentDropdowns();
+populateStudentSelect();
+    
     // Update UI
     renderStudents();
+    populateStudentSelect();
+    
+    fillStudentDropdowns();
     populateStudentSelect();
     
     showToast('Student deleted successfully', 'success');
@@ -2032,3 +2048,53 @@ function closeSidebar() {
     sidebar.classList.remove("active");
     overlay.classList.add("hidden");
 }
+
+// -----------------------------
+// STARTUP SCHOOL SELECTOR
+// -----------------------------
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const selector = document.getElementById("schoolSelector");
+    const closeSelector = document.getElementById("closeSelector");
+    const selectorCards = document.querySelectorAll(".selector-card");
+
+    // Show selector screen ON FIRST APP OPEN
+    if (!localStorage.getItem("schoolSelected")) {
+        selector.classList.remove("hidden");
+    }
+
+    // Close selector (X button)
+    closeSelector.addEventListener("click", () => {
+        selector.classList.add("hidden");
+        localStorage.setItem("schoolSelected", "true");
+    });
+
+    // When clicking any card
+    selectorCards.forEach(card => {
+        card.addEventListener("click", () => {
+            let page = card.getAttribute("data-link");
+            localStorage.setItem("schoolSelected", "true");
+            selector.classList.add("hidden");
+
+            // Redirect to selected link
+            window.location.href = page;
+        });
+    });
+
+});
+
+// -----------------------------
+// MANUAL OPEN: School Selector inside the app
+// -----------------------------
+
+document.addEventListener("DOMContentLoaded", function () {
+    const selector = document.getElementById("schoolSelector");
+    const changeSchoolTypeBtn = document.getElementById("changeSchoolTypeBtn");
+
+    if (changeSchoolTypeBtn) {
+        changeSchoolTypeBtn.addEventListener("click", () => {
+            selector.classList.remove("hidden");
+        });
+    }
+});
